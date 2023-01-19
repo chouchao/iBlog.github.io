@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>在线笔记本</title>
+    <style type="text/css">
+        .container {
+            display: block;
+            width: 150px;
+            padding: 10px;
+            background-color: white;
+            border: 1px solid slategray;
+            font-weight: bold;
+        }
+
+        a {
+            color: black;
+            text-decoration: none;
+            display: block;
+            border: 1px solid black;
+        }
+
+        a:hover {
+            background-color: gainsboro;
+        }
+
+        #selecttitle {
+            position: absolute;
+        }
+
+        #selecttitle ul li a {
+            margin: auto 10px;
+            display: block;
+            color: black;
+            text-decoration: none;
+        }
+
+        #selecttitle li ul {
+            padding: 0;
+        }
+
+        #selecttitle li ul li {
+            list-style: none;
+            margin-top: 10px;
+            text-align: center;
+        }
+
+        #selecttitle li ul li a {
+            width: 130px;
+            background-color: white;
+            text-align: center;
+        }
+
+        #selecttitle li ul li a:hover {
+            background-color: gainsboro;
+        }
+
+        #theme {
+            position: absolute;
+            width: 1000px;
+            margin-left: 250px;
+            border-width: 0px 1px 1px 1px;
+            border-style: solid;
+            border-color: black;
+        }
+
+        #title {
+            position: absolute;
+            width: 900px;
+            margin-left: 250px;
+            margin-top: 16px;
+            text-align: center;
+            color: black;
+            font-size: 20px;
+        }
+
+        #ta {
+            width: 900px;
+            position: absolute;
+            margin-left: 250px;
+            margin-top: 46px;
+        }
+
+        td {
+            border: 1px solid black;
+        }
+
+        th {
+            border: 1px solid black;
+        }
+
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script type="text/javascript">
+        function total(t) {
+            let tree = document.getElementById(t);
+            tree.style.display = "none";                                 //设置样式为隐藏
+            let list = tree.getElementsByTagName("li");
+            for (let i = 0; i < list.length; i++) {                             //主导航栏
+                list[i].id = "li" + i;
+                let ulst = list[i].getElementsByTagName("ul");                  //子导航栏
+                if (ulst.length != 0) {
+                    ulst[0].id = "ul" + i;
+                    ulst[0].style.display = "none";
+                    let as = list[i].getElementsByTagName("a");                //子导航栏的内容
+                    as[0].id = "a" + i;
+                    as[0].className = "folder";
+                    as[0].href = "#this";
+                    as[0].tget = ulst[0];
+                    as[0].onclick = function () {
+                        clickfolder(this, this.tget);                           //点击函数
+                    }
+                }
+            }
+            tree.style.display = "block";
+        }
+        function clickfolder(a, t) {
+            if (t.style.display == "block") {                           //展开和折叠
+                t.style.display = "none";
+                a.className = "folder";
+            } else {
+                t.style.display = "block";
+                a.className = "hide";
+            }
+        }
+        function edit(e) {                                            //编辑函数
+            let tdmain = document.getElementsByTagName('td');
+            for (let i = 0; i < tdmain.length; i++) {
+                tdmain[i].onclick = function () {
+                    for (let i = 0; i < this.childNodes.length; i++) {
+                        if (this.childNodes[i].nodeName == 'INPUT') {
+                            return false;
+                        }
+                    }
+                    let oldtext = this.innerText;                      //老文本
+                    this.innerHTML = '';                               //消除老文本 
+                    let inputtext = document.createElement('input');   //创建新文本
+                    inputtext.type = "text";
+                    inputtext.value = oldtext;
+                    inputtext.style.cssText = "border:0px;font-size:16px;width:100%";
+                    this.appendChild(inputtext);
+                    inputtext.focus();
+                    inputtext.select();
+                    let tdtext = this;
+                    inputtext.onkeyup = function (e) {
+                        let event = e || windiw.event;
+                        if (event.keyCode == 13) {                     //按回车可以保存内容
+                            tdtext.innerHTML = this.value;
+                        }
+                    }
+                }
+            }
+        }
+        function deleterow(d) {                                        //删除
+            let i = d.parentNode.parentNode.rowIndex;
+            document.getElementById('ta').deleteRow(i);
+        }
+        function moveup(u) {
+            let tru = document.getElementsByTagName("tr");
+            let tdd = document.getElementsByTagName("td");
+            for (let i = 0; i <= tdd.length; i++) {
+                let temp = u.parentNode.parentNode.children[i].innerHTML;
+                //向上移动，和上一位交换数据
+                u.parentNode.parentNode.children[i].innerHTML = u.parentNode.parentNode.previousSibling.children[i].innerHTML;
+                u.parentNode.parentNode.previousSibling.children[i].innerHTML = temp;
+            }
+        }
+        function movedown(d) {
+            let trd = document.getElementsByTagName("tr");
+            let tdd = document.getElementsByTagName("td");
+            for (let i = 0; i <= tdd.length; i++) {
+                let temp = d.parentNode.parentNode.children[i].innerHTML;
+                //向下移动，和下一位交换数据
+                d.parentNode.parentNode.children[i].innerHTML = d.parentNode.parentNode.nextSibling.children[i].innerHTML;
+                d.parentNode.parentNode.nextSibling.children[i].innerHTML = temp;
+            }
+        }
+        function addrow(a) {                                                    //创建
+            let ta = document.getElementById('ta');
+            let tm = document.getElementById('main');
+            let tse = document.getElementById('badd');
+            let th = document.getElementById('add');
+            let tf = document.getElementById('del');
+            let tfi = document.getElementById('up');
+            let ts = document.getElementById('down');
+            let tra = document.createElement('tr');
+            let tda = document.createElement('td');
+            tda.innerHTML = ta.tBodies[0].rows.length - 1;                      //编号创建
+            tra.appendChild(tda);
+
+            let tdb = document.createElement('td');                             //内容创建
+            tdb.innerHTML = tm.innerHTML;
+            tra.appendChild(tdb);
+
+            let tdse = document.createElement('td');                             //按钮创建
+            tdse.innerHTML = tse.innerHTML;
+            tra.appendChild(tdse);
+
+            let tdt = document.createElement('td');
+            tdt.innerHTML = th.innerHTML;
+            tra.appendChild(tdt);
+
+            let tdf = document.createElement('td');
+            tdf.innerHTML = tf.innerHTML;
+            tra.appendChild(tdf);
+
+            let tdfi = document.createElement('td');
+            tdfi.innerHTML = tfi.innerHTML;
+            tra.appendChild(tdfi);
+
+            let tds = document.createElement('td');
+            tds.innerHTML = ts.innerHTML;
+            tra.appendChild(tds);
+
+            ta.tBodies[0].appendChild(tra);
+            edit("ta");
+        }
+        function baddrow(a) {                                                   //向前创建
+            let ta = document.getElementById('ta');
+            let tm = document.getElementById('main');
+            let tse = document.getElementById('badd');
+            let th = document.getElementById('add');
+            let tf = document.getElementById('del');
+            let tfi = document.getElementById('up');
+            let ts = document.getElementById('down');
+            let tra = document.createElement('tr');
+            let tda = document.createElement('td');
+            tda.innerHTML = ta.tBodies[0].rows.length - 1;                      //编号创建
+            tra.appendChild(tda);
+
+            let tdb = document.createElement('td');                             //内容创建
+            tdb.innerHTML = tm.innerHTML;
+            tra.appendChild(tdb);
+
+            let tdse = document.createElement('td');                             //按钮创建
+            tdse.innerHTML = tse.innerHTML;
+            tra.appendChild(tdse);
+
+            let tdt = document.createElement('td');
+            tdt.innerHTML = th.innerHTML;
+            tra.appendChild(tdt);
+
+            let tdf = document.createElement('td');
+            tdf.innerHTML = tf.innerHTML;
+            tra.appendChild(tdf);
+
+            let tdfi = document.createElement('td');
+            tdfi.innerHTML = tfi.innerHTML;
+            tra.appendChild(tdfi);
+
+            let tds = document.createElement('td');
+            tds.innerHTML = ts.innerHTML;
+            tra.appendChild(tds);
+
+            ta.tBodies[0].insertBefore(tra, tra);
+            edit("ta");
+        }
+        window.onload = function () {
+            total("selecttitle");
+            edit("ta");
+        }
+    </script>
+</head>
+
+<body id="index">
+    <ul id="selecttitle">
+        <li class="container"><a href="#">健身计划</a>
+            <ul>
+                <li><a href="#">举重</a></li>
+                <li><a href="#">拉伸</a></li>
+                <li><a href="#">深蹲</a></li>
+            </ul>
+        </li>
+        <li class="container"><a href="#">学习计划</a>
+            <ul>
+                <li><a href="#">课堂学习情况</a></li>
+                <li><a href="#">完成作业情况</a></li>
+            </ul>
+        </li>
+        <li class="container"><a href="#">娱乐计划</a>
+            <ul>
+                <li><a href="#">半价</a></li>
+                <li><a href="#">新游</a></li>
+                <li><a href="#">MMR</a></li>
+            </ul>
+        </li>
+        <li class="container"><a href="#">生活计划</a>
+            <ul>
+                <li><a href="#">水电</a></li>
+                <li><a href="#">学习用品</a></li>
+                <li><a href="#">生活用品</a></li>
+            </ul>
+        </li>
+    </ul>
+    <class id="title">正文内容</class>
+    <table id="ta">
+        <tr>
+            <th width="50px">编号</th>
+            <th>内容</th>
+        </tr>
+        <tr>
+            <td width="30px">0</td>
+            <td id="main"></td>
+            <td id="badd" width="10px">
+                <input type="button" value="↑+" onclick="baddrow(this)">
+            </td>
+            <td id="add" width="10px">
+                <input type="button" value="↓+" onclick="addrow(this)">
+            </td>
+            <td id="del" width="10px">
+                <input type="button" value="-" onclick="deleterow(this)">
+            </td>
+            <td id="up" width="10px">
+                <input type="button" value="↑" onclick="moveup(this)">
+            </td>
+            <td id="down" width="10px">
+                <input type="button" value="↓" onclick="movedown(this)">
+            </td>
+        </tr>
+    </table>
+</body>
+
+</html>

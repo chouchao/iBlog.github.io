@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/utils.css">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/contact.css">
+    <link rel="stylesheet" href="css/mobile.css">
+    <title>login</title>
+</head>
+<script>
+    function Login(cid,cpasd){
+    const myHeaders = new Headers()
+    myHeaders.append("Content-Type", "application/json")
+    let requestOptions = {
+      method: "GET",  
+      headers: myHeaders,
+      redirect: "follow",
+    }
+    fetch(`https://db-api.amarea.cn/users?id=`+cid, requestOptions)
+    .then(response => response.json())
+    .then(data => {
+        console.log(data);
+        if(data[0].password == cpasd){
+            window.location.href="afterlogin.html";
+      }
+        else {
+        alert("错误")
+      }
+      let replace = data[0].name;
+      window.sessionStorage.setItem("rName",replace);
+      //location.assign("notebook.html");
+     })
+    .catch(err => console.log(err))
+    }
+    function Add(){
+    let ID = document.getElementById("username").value;
+    console.log(ID);
+    let Pasd = document.getElementById("passWord").value;
+    console.log(Pasd);
+        Login(ID,Pasd)
+    }
+    </script>
+<body>
+    <nav class="navigation max-width-1 m-auto">
+        <div class="nav-left">
+            <a href="/">
+                <span><img src="img/logo.png" width="94px" alt=""></span>
+            </a>
+            <ul>
+                <li><a href="index.html">主页</a></li>
+                <li><a href="contact.html">注册</a></li>
+            </ul>
+        </div>
+
+    </nav>
+    <div class="max-width-1 m-auto">
+        <hr>
+    </div>
+    <div class="contact-content font1 max-width-1 m-auto">
+        <div class="max-width-1 m-auto mx-1">
+            <h2>登录</h2>
+            <div class="contact-form">
+                <div class="form-box">用户名:&emsp;
+                    <input type="id" id="username">
+                </div>
+                <div class="form-box">密&emsp;码:&emsp;
+                    <input type="password" id="passWord">
+                </div>
+                <div class="form-box">
+                    <button class="btn" value="登录" onclick="Add(this)">登录</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="footer">
+        <p>Copyright &copy; iBlog.com </p>
+    </div>
+</body>
+</html>

@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/utils.css">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/contact.css">
+    <link rel="stylesheet" href="css/mobile.css">
+    <title>change</title>
+</head>
+<script>
+    function ChangeUserData(cid, cpasd) {
+        const myHeaders = new Headers()
+        myHeaders.append("Content-Type", "application/json")
+        let requestOptions = {
+            method: "PUT",
+            headers: myHeaders,
+            redirect: "follow",
+        }
+        const userData = {
+            id: cid,
+            password: cpasd,
+        }
+        requestOptions.body = JSON.stringify(userData);
+        fetch(`https://db-api.amarea.cn/users?id=`+cid, requestOptions)
+            .then(response => console.log("保存数据成功"))
+            .catch(err => console.log(err));
+    }
+    function Add() {
+            let ID = document.getElementById("username").value;
+            console.log(ID);
+            let aPasd = document.getElementById("one").value;
+            console.log(aPasd);
+            let bPasd = document.getElementById("two").value;
+            console.log(bPasd);
+            if(aPasd == bPasd){
+                ChangeUserData(ID,aPasd)
+            }
+            else {
+                alert("两次密码输入不相符,请重新输入")
+            }
+    }
+    </script>
+<body>
+    <nav class="navigation max-width-1 m-auto">
+        <div class="nav-left">
+            <a href="/">
+                <span><img src="img/logo.png" width="94px" alt=""></span>
+            </a>
+            <ul>
+                <li><a href="afterlogin.html">主页</a></li>
+                <li><a href="contact.html">注册</a></li>
+            </ul>
+        </div>
+        <div class="nav-right">
+            <form action="search.html" method="get">
+                <input class="form-input" type="text" name="query">
+                <button class="btn">Search</button>
+            </form>
+
+        </div>
+
+    </nav>
+    <div class="max-width-1 m-auto">
+        <hr>
+    </div>
+    <div class="contact-content font1 max-width-1 m-auto">
+        <div class="max-width-1 m-auto mx-1">
+            <h2>修改密码</h2>
+            <div class="contact-form">
+                <div class="form-box">对应用户名：
+                    <input type="id" id="username">
+                </div>
+                <div class="form-box">新&emsp;密&emsp;码：<input type="apassword" id="one">
+                </div>
+                <div class="form-box">重复新密码：<input type="bpassword" id="two">
+                </div>
+                <div class="form-box">
+                    <button class="btn" value="登录" onclick="Add(this)">修改</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="footer">
+        <p>Copyright &copy; iBlog.com </p>
+    </div>
+</body>
+</html>
